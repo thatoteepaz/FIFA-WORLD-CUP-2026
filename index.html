@@ -7,334 +7,139 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
-    --green: #08df37;
-    --green-dark: #0c72e0;
-    --red: #e90a0a;
-    --gold: #FFD600;
-    --bg: #0a0d0e;
-    --surface: #131a13;
-    --surface2: #1c261c;
+    --green: #0def6b; --green-dark: #007B33;
+    --red: #ff1717; --gold: #FFD600;
+    --bg: #0a0e0a; --surface: #131a13; --surface2: #1c261c;
     --border: rgba(255,255,255,0.08);
-    --text: #f0f4f0;
-    --muted: #7a8c7a;
+    --text: #f0f4f0; --muted: #7a8c7a;
     --font-display: 'Bebas Neue', sans-serif;
     --font-body: 'DM Sans', sans-serif;
-    --radius: 16px;
-    --radius-sm: 10px;
+    --radius: 16px; --radius-sm: 10px;
   }
+  body { background:var(--bg); color:var(--text); font-family:var(--font-body); min-height:100vh; overflow-x:hidden; }
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font-body);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+  .header { background:var(--surface); border-bottom:1px solid var(--border); padding:1.2rem 1.25rem 1rem; position:sticky; top:0; z-index:10; display:flex; align-items:center; gap:12px; }
+  .header-ball { font-size:28px; line-height:1; }
+  .header-text h1 { font-family:var(--font-display); font-size:22px; letter-spacing:1px; color:var(--gold); line-height:1; }
+  .header-text p { font-size:11px; color:var(--muted); letter-spacing:0.5px; margin-top:2px; }
 
-  /* ── HEADER ── */
-  .header {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 1.2rem 1.25rem 1rem;
-    position: sticky; top: 0; z-index: 10;
-    display: flex; align-items: center; gap: 12px;
-  }
-  .header-ball {
-    font-size: 28px; line-height: 1;
-  }
-  .header-text h1 {
-    font-family: var(--font-display);
-    font-size: 22px; letter-spacing: 1px;
-    color: var(--gold); line-height: 1;
-  }
-  .header-text p {
-    font-size: 11px; color: var(--muted);
-    letter-spacing: 0.5px; margin-top: 2px;
-  }
+  .steps { display:flex; gap:6px; padding:1rem 1.25rem 0; }
+  .step-dot { flex:1; height:3px; background:var(--surface2); border-radius:2px; transition:background 0.3s; }
+  .step-dot.active { background:var(--green); }
+  .step-dot.done   { background:var(--green-dark); }
 
-  /* ── STEP INDICATOR ── */
-  .steps {
-    display: flex; gap: 6px;
-    padding: 1rem 1.25rem 0;
-  }
-  .step-dot {
-    flex: 1; height: 3px;
-    background: var(--surface2);
-    border-radius: 2px;
-    transition: background 0.3s;
-  }
-  .step-dot.active { background: var(--green); }
-  .step-dot.done   { background: var(--green-dark); }
+  .screen { display:none; padding:1.25rem; }
+  .screen.active { display:block; }
 
-  /* ── SCREENS ── */
-  .screen { display: none; padding: 1.25rem; }
-  .screen.active { display: block; }
+  .section-label { font-size:11px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); margin-bottom:1rem; }
 
-  /* ── SECTION LABEL ── */
-  .section-label {
-    font-size: 11px; font-weight: 600;
-    letter-spacing: 1.5px; text-transform: uppercase;
-    color: var(--muted); margin-bottom: 1rem;
-  }
+  .team-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.2rem; margin-bottom:1rem; }
+  .team-card-header { display:flex; align-items:center; gap:10px; margin-bottom:1rem; }
+  .team-badge { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-size:15px; font-weight:700; flex-shrink:0; }
+  .badge-1 { background:rgba(0,200,83,0.15); color:var(--green); }
+  .badge-2 { background:rgba(255,23,68,0.15); color:var(--red); }
+  .team-card-title { font-size:13px; font-weight:600; color:var(--muted); letter-spacing:0.5px; }
 
-  /* ── TEAM INPUT CARDS ── */
-  .team-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1.2rem;
-    margin-bottom: 1rem;
+  .field { margin-bottom:0.9rem; }
+  .field label { display:block; font-size:12px; color:var(--muted); margin-bottom:6px; font-weight:500; }
+  input[type="text"], input[type="number"] {
+    width:100%; background:var(--surface2); border:1px solid var(--border);
+    border-radius:var(--radius-sm); color:var(--text); font-family:var(--font-body);
+    font-size:15px; padding:0.75rem 1rem; outline:none; transition:border-color 0.2s; -webkit-appearance:none;
   }
-  .team-card-header {
-    display: flex; align-items: center; gap: 10px;
-    margin-bottom: 1rem;
-  }
-  .team-badge {
-    width: 36px; height: 36px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-family: var(--font-display);
-    font-size: 15px; font-weight: 700;
-    flex-shrink: 0;
-  }
-  .badge-1 { background: rgba(0,200,83,0.15); color: var(--green); }
-  .badge-2 { background: rgba(255,23,68,0.15); color: var(--red); }
-  .team-card-title {
-    font-size: 13px; font-weight: 600;
-    color: var(--muted); letter-spacing: 0.5px;
-  }
+  input:focus { border-color:var(--green); }
+  input[type="number"] { text-align:center; font-weight:600; }
 
-  /* ── INPUTS ── */
-  .field { margin-bottom: 0.9rem; }
-  .field label {
-    display: block; font-size: 12px;
-    color: var(--muted); margin-bottom: 6px;
-    font-weight: 500;
-  }
-  input[type="text"], input[type="number"], select {
-    width: 100%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    color: var(--text);
-    font-family: var(--font-body);
-    font-size: 15px;
-    padding: 0.75rem 1rem;
-    outline: none;
-    transition: border-color 0.2s;
-    -webkit-appearance: none;
-  }
-  input:focus, select:focus {
-    border-color: var(--green);
-  }
-  input[type="number"] { text-align: center; font-weight: 600; }
-  select { color: var(--text); }
-  select option { background: #1c261c; }
-
-  /* ── NUMBER ROW ── */
-  .num-row {
-    display: flex; gap: 8px; align-items: center;
-  }
-  .num-row input { text-align: center; }
+  /* Full-width number stepper — each stat gets its own line */
+  .num-row { display:flex; gap:8px; align-items:center; }
+  .num-row input { flex:1; min-width:0; text-align:center; }
   .num-btn {
-    width: 44px; height: 44px; flex-shrink: 0;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    color: var(--text); font-size: 20px;
-    cursor: pointer; transition: background 0.15s;
-    display: flex; align-items: center; justify-content: center;
-    -webkit-tap-highlight-color: transparent;
+    width:48px; height:48px; flex-shrink:0;
+    background:var(--surface2); border:1px solid var(--border);
+    border-radius:var(--radius-sm); color:var(--text); font-size:22px;
+    cursor:pointer; transition:background 0.15s;
+    display:flex; align-items:center; justify-content:center;
+    -webkit-tap-highlight-color:transparent; user-select:none;
   }
-  .num-btn:active { background: var(--border); }
+  .num-btn:active { background:rgba(255,255,255,0.1); }
 
-  /* ── FORM ROW (two inputs side by side) ── */
-  .form-row {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
-    margin-bottom: 1rem;
-  }
+  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:1rem; }
 
-  /* ── BUTTONS ── */
   .btn-primary {
-    width: 100%; padding: 1rem;
-    background: var(--green);
-    color: #000;
-    border: none; border-radius: var(--radius);
-    font-family: var(--font-display);
-    font-size: 18px; letter-spacing: 1px;
-    cursor: pointer;
-    transition: opacity 0.2s, transform 0.1s;
-    -webkit-tap-highlight-color: transparent;
-    margin-top: 0.5rem;
+    width:100%; padding:1rem; background:var(--green); color:#000;
+    border:none; border-radius:var(--radius); font-family:var(--font-display);
+    font-size:18px; letter-spacing:1px; cursor:pointer;
+    transition:opacity 0.2s,transform 0.1s; -webkit-tap-highlight-color:transparent; margin-top:0.5rem;
   }
-  .btn-primary:active { opacity: 0.85; transform: scale(0.98); }
-
+  .btn-primary:active { opacity:0.85; transform:scale(0.98); }
   .btn-secondary {
-    width: 100%; padding: 0.85rem;
-    background: transparent;
-    color: var(--muted);
-    border: 1px solid var(--border); border-radius: var(--radius);
-    font-family: var(--font-body); font-size: 14px;
-    cursor: pointer; margin-top: 0.75rem;
-    -webkit-tap-highlight-color: transparent;
+    width:100%; padding:0.85rem; background:transparent; color:var(--muted);
+    border:1px solid var(--border); border-radius:var(--radius);
+    font-family:var(--font-body); font-size:14px; cursor:pointer; margin-top:0.75rem;
+    -webkit-tap-highlight-color:transparent;
   }
 
-  /* ── RESULT SCREEN ── */
-  .result-hero {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1.5rem 1.25rem;
-    text-align: center;
-    margin-bottom: 1rem;
-    position: relative; overflow: hidden;
-  }
-  .result-hero::before {
-    content: '';
-    position: absolute; inset: 0;
-    background: radial-gradient(ellipse at top, rgba(0,200,83,0.06) 0%, transparent 70%);
-    pointer-events: none;
-  }
-  .result-verdict {
-    font-family: var(--font-display);
-    font-size: 13px; letter-spacing: 2px;
-    color: var(--muted); margin-bottom: 0.5rem;
-  }
-  .result-winner {
-    font-family: var(--font-display);
-    font-size: 32px; letter-spacing: 1px;
-    color: var(--gold); line-height: 1.1;
-    margin-bottom: 0.25rem;
-  }
-  .result-action {
-    font-size: 13px; color: var(--muted);
-  }
-  .score-display {
-    display: flex; align-items: center;
-    justify-content: center; gap: 1rem;
-    margin: 1.25rem 0;
-  }
-  .score-team { text-align: center; flex: 1; }
-  .score-team-name {
-    font-size: 12px; color: var(--muted);
-    margin-bottom: 4px; font-weight: 500;
-    white-space: nowrap; overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .score-num {
-    font-family: var(--font-display);
-    font-size: 52px; color: var(--text); line-height: 1;
-  }
-  .score-sep {
-    font-family: var(--font-display);
-    font-size: 36px; color: var(--border);
-    flex-shrink: 0;
-  }
-  .confidence-badge {
-    display: inline-block;
-    padding: 4px 14px;
-    border-radius: 20px;
-    font-size: 12px; font-weight: 600;
-    margin-top: 0.5rem;
-    letter-spacing: 0.5px;
-  }
-  .conf-high   { background: rgba(0,200,83,0.15); color: var(--green); }
-  .conf-mod    { background: rgba(255,214,0,0.15); color: var(--gold); }
-  .conf-slim   { background: rgba(255,23,68,0.15); color: var(--red); }
+  /* RESULT */
+  .result-hero { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.5rem 1.25rem; text-align:center; margin-bottom:1rem; position:relative; overflow:hidden; }
+  .result-hero::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at top, rgba(0,200,83,0.06) 0%,transparent 70%); pointer-events:none; }
+  .result-verdict { font-family:var(--font-display); font-size:13px; letter-spacing:2px; color:var(--muted); margin-bottom:0.5rem; }
+  .result-winner { font-family:var(--font-display); font-size:32px; letter-spacing:1px; color:var(--gold); line-height:1.1; margin-bottom:0.25rem; }
+  .result-action { font-size:13px; color:var(--muted); }
+  .score-display { display:flex; align-items:center; justify-content:center; gap:1rem; margin:1.25rem 0; }
+  .score-team { text-align:center; flex:1; }
+  .score-team-name { font-size:12px; color:var(--muted); margin-bottom:4px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .score-num { font-family:var(--font-display); font-size:52px; color:var(--text); line-height:1; }
+  .score-sep { font-family:var(--font-display); font-size:36px; color:var(--border); flex-shrink:0; }
+  .confidence-badge { display:inline-block; padding:4px 14px; border-radius:20px; font-size:12px; font-weight:600; margin-top:0.5rem; letter-spacing:0.5px; }
+  .conf-high  { background:rgba(0,200,83,0.15); color:var(--green); }
+  .conf-mod   { background:rgba(255,214,0,0.15); color:var(--gold); }
+  .conf-slim  { background:rgba(255,23,68,0.15); color:var(--red); }
 
-  /* ── FACTOR BREAKDOWN ── */
-  .breakdown-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1.2rem;
-    margin-bottom: 1rem;
-  }
-  .breakdown-title {
-    font-size: 12px; font-weight: 600;
-    letter-spacing: 1px; text-transform: uppercase;
-    color: var(--muted); margin-bottom: 1rem;
-  }
-  .factor-row {
-    display: flex; align-items: center;
-    gap: 10px; margin-bottom: 10px;
-  }
-  .factor-label {
-    font-size: 12px; color: var(--muted);
-    width: 110px; flex-shrink: 0;
-  }
-  .factor-bars { flex: 1; display: flex; flex-direction: column; gap: 3px; }
-  .bar-wrap {
-    display: flex; align-items: center; gap: 6px;
-  }
-  .bar-track {
-    flex: 1; height: 6px;
-    background: var(--surface2);
-    border-radius: 3px; overflow: hidden;
-  }
-  .bar-fill {
-    height: 100%; border-radius: 3px;
-    transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
-  }
-  .bar-t1 { background: var(--green); }
-  .bar-t2 { background: var(--red); }
-  .bar-val {
-    font-size: 11px; font-weight: 600;
-    width: 28px; text-align: right;
-  }
-  .val-t1 { color: var(--green); }
-  .val-t2 { color: var(--red); }
+  /* BETTING TIPS */
+  .bet-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.2rem; margin-bottom:1rem; }
+  .bet-title { font-size:12px; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin-bottom:0.9rem; }
+  .bet-row { display:flex; align-items:center; justify-content:space-between; padding:0.65rem 0; border-bottom:1px solid var(--border); }
+  .bet-row:last-child { border-bottom:none; padding-bottom:0; }
+  .bet-label { font-size:13px; color:var(--text); }
+  .bet-pill { padding:3px 12px; border-radius:20px; font-size:12px; font-weight:600; }
+  .pill-yes  { background:rgba(0,200,83,0.15); color:var(--green); }
+  .pill-no   { background:rgba(255,23,68,0.15); color:var(--red); }
+  .pill-warn { background:rgba(255,214,0,0.15); color:var(--gold); }
 
-  /* ── WIN PROBABILITY ── */
-  .prob-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1.2rem;
-    margin-bottom: 1rem;
-  }
-  .prob-bar-outer {
-    height: 10px; border-radius: 5px;
-    background: var(--red);
-    margin: 0.75rem 0 0.5rem;
-    overflow: hidden;
-  }
-  .prob-bar-inner {
-    height: 100%; border-radius: 5px;
-    background: var(--green);
-    transition: width 1s cubic-bezier(0.4,0,0.2,1);
-  }
-  .prob-labels {
-    display: flex; justify-content: space-between;
-    font-size: 13px; font-weight: 600;
-  }
+  /* FACTOR BREAKDOWN */
+  .breakdown-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.2rem; margin-bottom:1rem; }
+  .breakdown-title { font-size:12px; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin-bottom:1rem; }
+  .factor-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .factor-label { font-size:12px; color:var(--muted); width:100px; flex-shrink:0; }
+  .factor-bars { flex:1; display:flex; flex-direction:column; gap:3px; }
+  .bar-wrap { display:flex; align-items:center; gap:6px; }
+  .bar-track { flex:1; height:6px; background:var(--surface2); border-radius:3px; overflow:hidden; }
+  .bar-fill { height:100%; border-radius:3px; transition:width 0.8s cubic-bezier(0.4,0,0.2,1); }
+  .bar-t1 { background:var(--green); }
+  .bar-t2 { background:var(--red); }
+  .bar-val { font-size:11px; font-weight:600; width:28px; text-align:right; }
+  .val-t1 { color:var(--green); }
+  .val-t2 { color:var(--red); }
 
-  /* ── DISCLAIMER ── */
-  .disclaimer {
-    font-size: 11px; color: var(--muted);
-    text-align: center; padding: 1rem 0 2rem;
-    line-height: 1.6;
-  }
+  .prob-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.2rem; margin-bottom:1rem; }
+  .prob-bar-outer { height:10px; border-radius:5px; background:var(--red); margin:0.75rem 0 0.5rem; overflow:hidden; }
+  .prob-bar-inner { height:100%; border-radius:5px; background:var(--green); transition:width 1s cubic-bezier(0.4,0,0.2,1); }
+  .prob-labels { display:flex; justify-content:space-between; font-size:13px; font-weight:600; }
 
-  /* ── PROGRESS BAR ANIMATION ── */
-  @keyframes fillIn { from { width: 0; } }
-  .animate { animation: fillIn 0.8s cubic-bezier(0.4,0,0.2,1) forwards; }
+  .disclaimer { font-size:11px; color:var(--muted); text-align:center; padding:1rem 0 2rem; line-height:1.6; }
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <div class="header">
   <div class="header-ball">⚽</div>
   <div class="header-text">
-    <h1>FIFA WORLD CUP 2026 Predictor</h1>
+    <h1>FIFA 2026 Predictor</h1>
     <p>7-FACTOR WEIGHTED ANALYSIS</p>
   </div>
 </div>
 
-<!-- STEP DOTS -->
 <div class="steps">
   <div class="step-dot active" id="dot-1"></div>
   <div class="step-dot" id="dot-2"></div>
@@ -348,43 +153,39 @@
 
   <div class="team-card">
     <div class="team-card-header">
-      <div class="team-badge badge-1">H</div>
-      <span class="team-card-title">HOME TEAM</span>
+      <div class="team-badge badge-1">T1</div>
+      <span class="team-card-title">TEAM ONE</span>
     </div>
     <div class="field">
       <label>Team Name</label>
       <input type="text" id="t1-name" placeholder="e.g. Brazil" autocomplete="off">
     </div>
-    <div class="form-row">
-      <div class="field" style="margin:0">
-        <label>FIFA Ranking</label>
-        <input type="number" id="t1-rank" placeholder="1" min="1" max="211">
-      </div>
-      <div class="field" style="margin:0">
-        <label>Key Players Avail.</label>
-        <input type="number" id="t1-squad" placeholder="11" min="0" max="11">
-      </div>
+    <div class="field">
+      <label>FIFA World Ranking (1–211) — higher weight</label>
+      <input type="number" id="t1-rank" placeholder="e.g. 1" min="1" max="211">
+    </div>
+    <div class="field" style="margin-bottom:0">
+      <label>Key Players Available (0–11)</label>
+      <input type="number" id="t1-squad" placeholder="e.g. 11" min="0" max="11">
     </div>
   </div>
 
   <div class="team-card">
     <div class="team-card-header">
-      <div class="team-badge badge-2">A</div>
-      <span class="team-card-title">AWAY TEAM</span>
+      <div class="team-badge badge-2">T2</div>
+      <span class="team-card-title">TEAM TWO</span>
     </div>
     <div class="field">
       <label>Team Name</label>
       <input type="text" id="t2-name" placeholder="e.g. France" autocomplete="off">
     </div>
-    <div class="form-row">
-      <div class="field" style="margin:0">
-        <label>FIFA Ranking</label>
-        <input type="number" id="t2-rank" placeholder="2" min="1" max="211">
-      </div>
-      <div class="field" style="margin:0">
-        <label>Key Players Avail.</label>
-        <input type="number" id="t2-squad" placeholder="11" min="0" max="11">
-      </div>
+    <div class="field">
+      <label>FIFA World Ranking (1–211) — higher weight</label>
+      <input type="number" id="t2-rank" placeholder="e.g. 2" min="1" max="211">
+    </div>
+    <div class="field" style="margin-bottom:0">
+      <label>Key Players Available (0–11)</label>
+      <input type="number" id="t2-squad" placeholder="e.g. 11" min="0" max="11">
     </div>
   </div>
 
@@ -395,104 +196,98 @@
 <div class="screen" id="screen-2">
   <p class="section-label" style="margin-top:1.2rem">Recent Form — Last 5 Games</p>
 
-  <div class="team-card" id="form-card-1">
+  <!-- TEAM 1 -->
+  <div class="team-card">
     <div class="team-card-header">
       <div class="team-badge badge-1" id="form-badge-1">T1</div>
       <span class="team-card-title" id="form-title-1">TEAM ONE</span>
     </div>
-    <div class="form-row">
-      <div class="field" style="margin:0">
-        <label>Wins</label>
-        <div class="num-row">
-          <button class="num-btn" onclick="adj('t1-fw',-1)">−</button>
-          <input type="number" id="t1-fw" value="0" min="0" max="5" readonly>
-          <button class="num-btn" onclick="adj('t1-fw',1)">+</button>
-        </div>
+    <div class="field">
+      <label>Wins</label>
+      <div class="num-row">
+        <button class="num-btn" onclick="adj('t1-fw',-1)">−</button>
+        <input type="number" id="t1-fw" value="0" min="0" max="5" readonly>
+        <button class="num-btn" onclick="adj('t1-fw',1)">+</button>
       </div>
-      <div class="field" style="margin:0">
-        <label>Draws</label>
-        <div class="num-row">
-          <button class="num-btn" onclick="adj('t1-fd',-1)">−</button>
-          <input type="number" id="t1-fd" value="0" min="0" max="5" readonly>
-          <button class="num-btn" onclick="adj('t1-fd',1)">+</button>
-        </div>
+    </div>
+    <div class="field">
+      <label>Draws</label>
+      <div class="num-row">
+        <button class="num-btn" onclick="adj('t1-fd',-1)">−</button>
+        <input type="number" id="t1-fd" value="0" min="0" max="5" readonly>
+        <button class="num-btn" onclick="adj('t1-fd',1)">+</button>
       </div>
     </div>
     <div class="field">
       <label>Losses</label>
       <div class="num-row">
         <button class="num-btn" onclick="adj('t1-fl',-1)">−</button>
-        <input type="number" id="t1-fl" value="0" min="0" max="5" readonly style="max-width:80px">
+        <input type="number" id="t1-fl" value="0" min="0" max="5" readonly>
         <button class="num-btn" onclick="adj('t1-fl',1)">+</button>
       </div>
     </div>
-    <div class="form-row">
-      <div class="field" style="margin:0">
-        <label>Goals Scored</label>
-        <div class="num-row">
-          <button class="num-btn" onclick="adj('t1-gs',-1)">−</button>
-          <input type="number" id="t1-gs" value="0" min="0" max="30" readonly>
-          <button class="num-btn" onclick="adj('t1-gs',1)">+</button>
-        </div>
+    <div class="field">
+      <label>Goals Scored</label>
+      <div class="num-row">
+        <button class="num-btn" onclick="adj('t1-gs',-1)">−</button>
+        <input type="number" id="t1-gs" value="0" min="0" max="30" readonly>
+        <button class="num-btn" onclick="adj('t1-gs',1)">+</button>
       </div>
-      <div class="field" style="margin:0">
-        <label>Goals Conceded</label>
-        <div class="num-row">
-          <button class="num-btn" onclick="adj('t1-gc',-1)">−</button>
-          <input type="number" id="t1-gc" value="0" min="0" max="30" readonly>
-          <button class="num-btn" onclick="adj('t1-gc',1)">+</button>
-        </div>
+    </div>
+    <div class="field" style="margin-bottom:0">
+      <label>Goals Conceded</label>
+      <div class="num-row">
+        <button class="num-btn" onclick="adj('t1-gc',-1)">−</button>
+        <input type="number" id="t1-gc" value="0" min="0" max="30" readonly>
+        <button class="num-btn" onclick="adj('t1-gc',1)">+</button>
       </div>
     </div>
   </div>
 
+  <!-- TEAM 2 -->
   <div class="team-card">
     <div class="team-card-header">
       <div class="team-badge badge-2" id="form-badge-2">T2</div>
       <span class="team-card-title" id="form-title-2">TEAM TWO</span>
     </div>
-    <div class="form-row">
-      <div class="field" style="margin:0">
-        <label>Wins</label>
-        <div class="num-row">
-          <button class="num-btn" onclick="adj('t2-fw',-1)">−</button>
-          <input type="number" id="t2-fw" value="0" min="0" max="5" readonly>
-          <button class="num-btn" onclick="adj('t2-fw',1)">+</button>
-        </div>
+    <div class="field">
+      <label>Wins</label>
+      <div class="num-row">
+        <button class="num-btn" onclick="adj('t2-fw',-1)">−</button>
+        <input type="number" id="t2-fw" value="0" min="0" max="5" readonly>
+        <button class="num-btn" onclick="adj('t2-fw',1)">+</button>
       </div>
-      <div class="field" style="margin:0">
-        <label>Draws</label>
-        <div class="num-row">
-          <button class="num-btn" onclick="adj('t2-fd',-1)">−</button>
-          <input type="number" id="t2-fd" value="0" min="0" max="5" readonly>
-          <button class="num-btn" onclick="adj('t2-fd',1)">+</button>
-        </div>
+    </div>
+    <div class="field">
+      <label>Draws</label>
+      <div class="num-row">
+        <button class="num-btn" onclick="adj('t2-fd',-1)">−</button>
+        <input type="number" id="t2-fd" value="0" min="0" max="5" readonly>
+        <button class="num-btn" onclick="adj('t2-fd',1)">+</button>
       </div>
     </div>
     <div class="field">
       <label>Losses</label>
       <div class="num-row">
         <button class="num-btn" onclick="adj('t2-fl',-1)">−</button>
-        <input type="number" id="t2-fl" value="0" min="0" max="5" readonly style="max-width:80px">
+        <input type="number" id="t2-fl" value="0" min="0" max="5" readonly>
         <button class="num-btn" onclick="adj('t2-fl',1)">+</button>
       </div>
     </div>
-    <div class="form-row">
-      <div class="field" style="margin:0">
-        <label>Goals Scored</label>
-        <div class="num-row">
-          <button class="num-btn" onclick="adj('t2-gs',-1)">−</button>
-          <input type="number" id="t2-gs" value="0" min="0" max="30" readonly>
-          <button class="num-btn" onclick="adj('t2-gs',1)">+</button>
-        </div>
+    <div class="field">
+      <label>Goals Scored</label>
+      <div class="num-row">
+        <button class="num-btn" onclick="adj('t2-gs',-1)">−</button>
+        <input type="number" id="t2-gs" value="0" min="0" max="30" readonly>
+        <button class="num-btn" onclick="adj('t2-gs',1)">+</button>
       </div>
-      <div class="field" style="margin:0">
-        <label>Goals Conceded</label>
-        <div class="num-row">
-          <button class="num-btn" onclick="adj('t2-gc',-1)">−</button>
-          <input type="number" id="t2-gc" value="0" min="0" max="30" readonly>
-          <button class="num-btn" onclick="adj('t2-gc',1)">+</button>
-        </div>
+    </div>
+    <div class="field" style="margin-bottom:0">
+      <label>Goals Conceded</label>
+      <div class="num-row">
+        <button class="num-btn" onclick="adj('t2-gc',-1)">−</button>
+        <input type="number" id="t2-gc" value="0" min="0" max="30" readonly>
+        <button class="num-btn" onclick="adj('t2-gc',1)">+</button>
       </div>
     </div>
   </div>
@@ -507,52 +302,48 @@
 
   <div class="team-card">
     <div class="breakdown-title">Head-to-Head History</div>
-    <div class="form-row">
-      <div class="field" style="margin:0">
-        <label id="h2h-w-label">Team 1 Wins</label>
-        <div class="num-row">
-          <button class="num-btn" onclick="adj('h2h-w',-1)">−</button>
-          <input type="number" id="h2h-w" value="0" min="0" max="50" readonly>
-          <button class="num-btn" onclick="adj('h2h-w',1)">+</button>
-        </div>
-      </div>
-      <div class="field" style="margin:0">
-        <label>Draws</label>
-        <div class="num-row">
-          <button class="num-btn" onclick="adj('h2h-d',-1)">−</button>
-          <input type="number" id="h2h-d" value="0" min="0" max="50" readonly>
-          <button class="num-btn" onclick="adj('h2h-d',1)">+</button>
-        </div>
+    <div class="field">
+      <label id="h2h-w-label">Team 1 Wins</label>
+      <div class="num-row">
+        <button class="num-btn" onclick="adj('h2h-w',-1)">−</button>
+        <input type="number" id="h2h-w" value="0" min="0" max="50" readonly>
+        <button class="num-btn" onclick="adj('h2h-w',1)">+</button>
       </div>
     </div>
     <div class="field">
+      <label>Draws</label>
+      <div class="num-row">
+        <button class="num-btn" onclick="adj('h2h-d',-1)">−</button>
+        <input type="number" id="h2h-d" value="0" min="0" max="50" readonly>
+        <button class="num-btn" onclick="adj('h2h-d',1)">+</button>
+      </div>
+    </div>
+    <div class="field" style="margin-bottom:0">
       <label id="h2h-l-label">Team 1 Losses</label>
       <div class="num-row">
         <button class="num-btn" onclick="adj('h2h-l',-1)">−</button>
-        <input type="number" id="h2h-l" value="0" min="0" max="50" readonly style="max-width:80px">
+        <input type="number" id="h2h-l" value="0" min="0" max="50" readonly>
         <button class="num-btn" onclick="adj('h2h-l',1)">+</button>
       </div>
     </div>
   </div>
 
   <div class="team-card">
-    <div class="breakdown-title">Injuries & Suspensions</div>
-    <div class="form-row">
-      <div class="field" style="margin:0">
-        <label id="inj-1-label">Team 1 Out</label>
-        <div class="num-row">
-          <button class="num-btn" onclick="adj('t1-inj',-1)">−</button>
-          <input type="number" id="t1-inj" value="0" min="0" max="11" readonly>
-          <button class="num-btn" onclick="adj('t1-inj',1)">+</button>
-        </div>
+    <div class="breakdown-title">Injuries &amp; Suspensions</div>
+    <div class="field">
+      <label id="inj-1-label">Team 1 Players Out</label>
+      <div class="num-row">
+        <button class="num-btn" onclick="adj('t1-inj',-1)">−</button>
+        <input type="number" id="t1-inj" value="0" min="0" max="11" readonly>
+        <button class="num-btn" onclick="adj('t1-inj',1)">+</button>
       </div>
-      <div class="field" style="margin:0">
-        <label id="inj-2-label">Team 2 Out</label>
-        <div class="num-row">
-          <button class="num-btn" onclick="adj('t2-inj',-1)">−</button>
-          <input type="number" id="t2-inj" value="0" min="0" max="11" readonly>
-          <button class="num-btn" onclick="adj('t2-inj',1)">+</button>
-        </div>
+    </div>
+    <div class="field" style="margin-bottom:0">
+      <label id="inj-2-label">Team 2 Players Out</label>
+      <div class="num-row">
+        <button class="num-btn" onclick="adj('t2-inj',-1)">−</button>
+        <input type="number" id="t2-inj" value="0" min="0" max="11" readonly>
+        <button class="num-btn" onclick="adj('t2-inj',1)">+</button>
       </div>
     </div>
   </div>
@@ -582,6 +373,27 @@
     <span class="confidence-badge" id="res-conf">—</span>
   </div>
 
+  <!-- BETTING TIPS -->
+  <div class="bet-card">
+    <div class="bet-title">⚡ Betting Tips</div>
+    <div class="bet-row">
+      <span class="bet-label" id="bet-btts-label">Both Teams to Score</span>
+      <span class="bet-pill" id="bet-btts">—</span>
+    </div>
+    <div class="bet-row">
+      <span class="bet-label" id="bet-goals-label">Total Goals</span>
+      <span class="bet-pill" id="bet-goals">—</span>
+    </div>
+    <div class="bet-row">
+      <span class="bet-label" id="bet-winner-label">Match Result</span>
+      <span class="bet-pill" id="bet-winner">—</span>
+    </div>
+    <div class="bet-row" style="border-bottom:none; padding-bottom:0">
+      <span class="bet-label">Correct Score</span>
+      <span class="bet-pill pill-warn" id="bet-score">—</span>
+    </div>
+  </div>
+
   <!-- Win Probability -->
   <div class="prob-card">
     <div class="breakdown-title">Win Probability</div>
@@ -605,51 +417,43 @@
   </div>
 
   <button class="btn-primary" onclick="reset()">🔄 NEW PREDICTION</button>
-
-  <p class="disclaimer">
-    © Copyright 2026 Thato Baloyi.<br>
-    Bet Resposible.
-  </p>
+  <p class="disclaimer">© Copyright 2026 Thato.Predictions</p>
 </div>
 
 <script>
+/* FIFA ranking weight boosted to 25%, form stays 25% */
 const FACTORS = [
-  { key:'ranking', label:'FIFA Ranking',   w:0.20 },
-  { key:'form',    label:'Recent Form',    w:0.25 },
-  { key:'attack',  label:'Goals Scored',   w:0.15 },
-  { key:'defence', label:'Goals Conceded', w:0.10 },
-  { key:'h2h',     label:'Head-to-Head',   w:0.15 },
-  { key:'squad',   label:'Squad Strength', w:0.10 },
-  { key:'injuries',label:'Fitness',        w:0.05 },
+  { key:'ranking',  label:'FIFA Ranking',  w:0.25 },
+  { key:'form',     label:'Recent Form',   w:0.25 },
+  { key:'attack',   label:'Goals Scored',  w:0.13 },
+  { key:'defence',  label:'Goals Conceded',w:0.10 },
+  { key:'h2h',      label:'Head-to-Head',  w:0.12 },
+  { key:'squad',    label:'Squad Strength',w:0.10 },
+  { key:'injuries', label:'Fitness',       w:0.05 },
 ];
 
-let scores1 = {}, scores2 = {};
-
+let scores1={}, scores2={};
 function $id(id){ return document.getElementById(id); }
-function val(id){ return parseFloat($id(id).value) || 0; }
+function val(id){ return parseFloat($id(id).value)||0; }
 
-function adj(id, delta){
-  const el = $id(id);
-  const min = parseFloat(el.min)||0;
-  const max = parseFloat(el.max)||999;
-  el.value = Math.min(max, Math.max(min, (parseFloat(el.value)||0)+delta));
+function adj(id,delta){
+  const el=$id(id);
+  const mn=parseFloat(el.min)||0, mx=parseFloat(el.max)||999;
+  el.value=Math.min(mx,Math.max(mn,(parseFloat(el.value)||0)+delta));
 }
 
 function goTo(n){
   if(n===2){
-    const n1 = $id('t1-name').value.trim();
-    const n2 = $id('t2-name').value.trim();
+    const n1=$id('t1-name').value.trim(), n2=$id('t2-name').value.trim();
     if(!n1||!n2){ alert('Please enter both team names.'); return; }
-    // update labels on screen 2
-    $id('form-badge-1').textContent = n1.substring(0,2).toUpperCase();
-    $id('form-badge-2').textContent = n2.substring(0,2).toUpperCase();
-    $id('form-title-1').textContent = n1.toUpperCase();
-    $id('form-title-2').textContent = n2.toUpperCase();
-    // h2h labels
-    $id('h2h-w-label').textContent  = n1 + ' Wins';
-    $id('h2h-l-label').textContent  = n1 + ' Losses';
-    $id('inj-1-label').textContent  = n1 + ' Out';
-    $id('inj-2-label').textContent  = n2 + ' Out';
+    $id('form-badge-1').textContent=n1.substring(0,2).toUpperCase();
+    $id('form-badge-2').textContent=n2.substring(0,2).toUpperCase();
+    $id('form-title-1').textContent=n1.toUpperCase();
+    $id('form-title-2').textContent=n2.toUpperCase();
+    $id('h2h-w-label').textContent=n1+' Wins';
+    $id('h2h-l-label').textContent=n1+' Losses';
+    $id('inj-1-label').textContent=n1+' Players Out';
+    $id('inj-2-label').textContent=n2+' Players Out';
   }
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   $id('screen-'+n).classList.add('active');
@@ -659,51 +463,73 @@ function goTo(n){
 
 function updateDots(n){
   for(let i=1;i<=4;i++){
-    const d=$id('dot-'+i);
-    if(!d) return;
+    const d=$id('dot-'+i); if(!d) return;
     d.className='step-dot'+(i<n?' done':i===n?' active':'');
   }
 }
 
-function formScore(w,d,l){
-  const g=w+d+l; if(!g) return 50;
-  return Math.round((w*3+d)/( g*3)*100);
-}
+function formScore(w,d,l){ const g=w+d+l; if(!g) return 50; return Math.round((w*3+d)/(g*3)*100); }
 function rankScore(r){ return Math.round(Math.max(0,(211-r)/210*100)); }
 function attackScore(g){ return Math.min(100,Math.round(g/5/4*100)); }
 function defenceScore(g){ return Math.max(0,Math.round((1-g/5/4)*100)); }
 function squadScore(k){ return Math.round(Math.min(k/11,1)*100); }
 function injuryScore(i){ return Math.max(0,Math.round((1-i/5)*100)); }
 
-function calcScores(prefix, h2hw, h2hd, h2hl){
-  const rank  = val(prefix+'-rank') || 50;
-  const squad = val(prefix+'-squad');
-  const fw    = val(prefix+'-fw');
-  const fd    = val(prefix+'-fd');
-  const fl    = val(prefix+'-fl');
-  const gs    = val(prefix+'-gs');
-  const gc    = val(prefix+'-gc');
-  const inj   = val(prefix+'-inj');
+function calcScores(prefix,h2hw,h2hd,h2hl){
   return {
-    ranking:  rankScore(rank),
-    form:     formScore(fw,fd,fl),
-    attack:   attackScore(gs),
-    defence:  defenceScore(gc),
+    ranking:  rankScore(val(prefix+'-rank')||50),
+    form:     formScore(val(prefix+'-fw'),val(prefix+'-fd'),val(prefix+'-fl')),
+    attack:   attackScore(val(prefix+'-gs')),
+    defence:  defenceScore(val(prefix+'-gc')),
     h2h:      formScore(h2hw,h2hd,h2hl),
-    squad:    squadScore(squad),
-    injuries: injuryScore(inj),
+    squad:    squadScore(val(prefix+'-squad')),
+    injuries: injuryScore(val(prefix+'-inj')),
   };
 }
 
-function composite(sc){
-  return Math.round(FACTORS.reduce((s,f)=>s+sc[f.key]*f.w,0)*10)/10;
-}
+function composite(sc){ return Math.round(FACTORS.reduce((s,f)=>s+sc[f.key]*f.w,0)*10)/10; }
 
 function predictScore(c1,c2){
   const base=1.2, gap=Math.abs(c1-c2)/100;
   if(c1>c2) return [Math.max(0,Math.round(base+gap*2)), Math.max(0,Math.round(base-gap))];
   if(c2>c1) return [Math.max(0,Math.round(base-gap)),   Math.max(0,Math.round(base+gap*2))];
   return [Math.round(base),Math.round(base)];
+}
+
+function bettingTips(n1,n2,s1,s2,c1,c2,p1,p2){
+  const total=s1+s2;
+  const btts=s1>0&&s2>0;
+
+  // Both teams to score
+  $id('bet-btts-label').textContent='Both Teams to Score';
+  const bttsEl=$id('bet-btts');
+  if(btts){ bttsEl.textContent='YES ✓'; bttsEl.className='bet-pill pill-yes'; }
+  else { bttsEl.textContent='NO ✗'; bttsEl.className='bet-pill pill-no'; }
+
+  // Over/under
+  const goalsEl=$id('bet-goals');
+  $id('bet-goals-label').textContent='Total Goals Line';
+  if(total<=1){ goalsEl.textContent='Under 2.5'; goalsEl.className='bet-pill pill-yes'; }
+  else if(total<=2){ goalsEl.textContent='Under 3.5'; goalsEl.className='bet-pill pill-yes'; }
+  else if(total<=4){ goalsEl.textContent='Under 4.5'; goalsEl.className='bet-pill pill-yes'; }
+  else { goalsEl.textContent='Over 4.5'; goalsEl.className='bet-pill pill-warn'; }
+
+  // Double Chance — favoured team + draw covers a close predicted scoreline
+  const winEl=$id('bet-winner');
+  $id('bet-winner-label').textContent='Double Chance';
+  if(s1===s2){
+    // Score is a draw — back the favoured team or draw
+    if(c1>c2){ winEl.textContent=n1+' / Draw'; winEl.className='bet-pill pill-yes'; }
+    else if(c2>c1){ winEl.textContent=n2+' / Draw'; winEl.className='bet-pill pill-yes'; }
+    else { winEl.textContent='Draw'; winEl.className='bet-pill pill-warn'; }
+  } else if(s1>s2){
+    winEl.textContent=n1+' / Draw'; winEl.className='bet-pill pill-yes';
+  } else {
+    winEl.textContent=n2+' / Draw'; winEl.className='bet-pill pill-yes';
+  }
+
+  // Correct score
+  $id('bet-score').textContent=s1+' — '+s2;
 }
 
 function predict(){
@@ -717,16 +543,16 @@ function predict(){
   const c1=composite(scores1), c2=composite(scores2);
   const total=c1+c2||1;
   const p1=Math.round(c1/total*100), p2=100-p1;
-
   const [s1,s2]=predictScore(c1,c2);
+
   const margin=Math.abs(c1-c2);
   const conf=margin>15?'High':margin>7?'Moderate':'Slim';
   const confClass={'High':'conf-high','Moderate':'conf-mod','Slim':'conf-slim'}[conf];
 
   let winner,verdict,action;
-  if(c1>c2){ winner=n1; verdict='WINS THE MATCH'; action='predicted winner'; }
-  else if(c2>c1){ winner=n2; verdict='WINS THE MATCH'; action='predicted winner'; }
-  else{ winner='DRAW'; verdict='TOO CLOSE TO CALL'; action='match likely ends level'; }
+  if(s1===s2){ winner='DRAW'; verdict='TOO CLOSE TO CALL'; action='match likely ends level'; }
+  else if(s1>s2){ winner=n1; verdict='WINS THE MATCH'; action='predicted winner'; }
+  else{ winner=n2; verdict='WINS THE MATCH'; action='predicted winner'; }
 
   $id('res-winner').textContent=winner;
   $id('res-verdict').textContent=verdict;
@@ -744,14 +570,16 @@ function predict(){
   $id('prob-p2').textContent=p2+'%';
   setTimeout(()=>{ $id('prob-bar').style.width=p1+'%'; },100);
 
-  // Render factor bars
+  bettingTips(n1,n2,s1,s2,c1,c2,p1,p2);
+
   const list=$id('factors-list');
   list.innerHTML='';
   FACTORS.forEach(f=>{
     const v1=scores1[f.key], v2=scores2[f.key];
+    const w=Math.round(f.w*100);
     list.innerHTML+=`
     <div class="factor-row">
-      <span class="factor-label">${f.label}</span>
+      <span class="factor-label">${f.label}<br><span style="font-size:10px;color:var(--muted)">${w}% weight</span></span>
       <div class="factor-bars">
         <div class="bar-wrap">
           <div class="bar-track"><div class="bar-fill bar-t1" style="width:0%" data-v="${v1}"></div></div>
@@ -767,17 +595,14 @@ function predict(){
 
   goTo(4);
   setTimeout(()=>{
-    document.querySelectorAll('.bar-fill').forEach(b=>{
-      b.style.width=b.dataset.v+'%';
-    });
+    document.querySelectorAll('.bar-fill').forEach(b=>{ b.style.width=b.dataset.v+'%'; });
   },200);
 }
 
 function reset(){
   document.querySelectorAll('input[type=text]').forEach(i=>i.value='');
   document.querySelectorAll('input[type=number]').forEach(i=>{
-    if(i.id.includes('rank')) i.value='';
-    else if(i.id.includes('squad')) i.value='';
+    if(i.id.includes('rank')||i.id.includes('squad')) i.value='';
     else i.value='0';
   });
   goTo(1);
