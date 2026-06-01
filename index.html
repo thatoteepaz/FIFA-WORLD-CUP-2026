@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>FIFA 2026 Predictor</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green: #08df37;
+    --green-dark: #0c72e0;
+    --red: #e90a0a;
+    --gold: #FFD600;
+    --bg: #0a0d0e;
+    --surface: #131a13;
+    --surface2: #1c261c;
+    --border: rgba(255,255,255,0.08);
+    --text: #f0f4f0;
+    --muted: #7a8c7a;
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 1.2rem 1.25rem 1rem;
+    position: sticky; top: 0; z-index: 10;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .header-ball {
+    font-size: 28px; line-height: 1;
+  }
+  .header-text h1 {
+    font-family: var(--font-display);
+    font-size: 22px; letter-spacing: 1px;
+    color: var(--gold); line-height: 1;
+  }
+  .header-text p {
+    font-size: 11px; color: var(--muted);
+    letter-spacing: 0.5px; margin-top: 2px;
+  }
+
+  /* ── STEP INDICATOR ── */
+  .steps {
+    display: flex; gap: 6px;
+    padding: 1rem 1.25rem 0;
+  }
+  .step-dot {
+    flex: 1; height: 3px;
+    background: var(--surface2);
+    border-radius: 2px;
+    transition: background 0.3s;
+  }
+  .step-dot.active { background: var(--green); }
+  .step-dot.done   { background: var(--green-dark); }
+
+  /* ── SCREENS ── */
+  .screen { display: none; padding: 1.25rem; }
+  .screen.active { display: block; }
+
+  /* ── SECTION LABEL ── */
+  .section-label {
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 1rem;
+  }
+
+  /* ── TEAM INPUT CARDS ── */
+  .team-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.2rem;
+    margin-bottom: 1rem;
+  }
+  .team-card-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 1rem;
+  }
+  .team-badge {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display);
+    font-size: 15px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .badge-1 { background: rgba(0,200,83,0.15); color: var(--green); }
+  .badge-2 { background: rgba(255,23,68,0.15); color: var(--red); }
+  .team-card-title {
+    font-size: 13px; font-weight: 600;
+    color: var(--muted); letter-spacing: 0.5px;
+  }
+
+  /* ── INPUTS ── */
+  .field { margin-bottom: 0.9rem; }
+  .field label {
+    display: block; font-size: 12px;
+    color: var(--muted); margin-bottom: 6px;
+    font-weight: 500;
+  }
+  input[type="text"], input[type="number"], select {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 15px;
+    padding: 0.75rem 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+  input:focus, select:focus {
+    border-color: var(--green);
+  }
+  input[type="number"] { text-align: center; font-weight: 600; }
+  select { color: var(--text); }
+  select option { background: #1c261c; }
+
+  /* ── NUMBER ROW ── */
+  .num-row {
+    display: flex; gap: 8px; align-items: center;
+  }
+  .num-row input { text-align: center; }
+  .num-btn {
+    width: 44px; height: 44px; flex-shrink: 0;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text); font-size: 20px;
+    cursor: pointer; transition: background 0.15s;
+    display: flex; align-items: center; justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .num-btn:active { background: var(--border); }
+
+  /* ── FORM ROW (two inputs side by side) ── */
+  .form-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    margin-bottom: 1rem;
+  }
+
+  /* ── BUTTONS ── */
+  .btn-primary {
+    width: 100%; padding: 1rem;
+    background: var(--green);
+    color: #000;
+    border: none; border-radius: var(--radius);
+    font-family: var(--font-display);
+    font-size: 18px; letter-spacing: 1px;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    -webkit-tap-highlight-color: transparent;
+    margin-top: 0.5rem;
+  }
+  .btn-primary:active { opacity: 0.85; transform: scale(0.98); }
+
+  .btn-secondary {
+    width: 100%; padding: 0.85rem;
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    font-family: var(--font-body); font-size: 14px;
+    cursor: pointer; margin-top: 0.75rem;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* ── RESULT SCREEN ── */
+  .result-hero {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem 1.25rem;
+    text-align: center;
+    margin-bottom: 1rem;
+    position: relative; overflow: hidden;
+  }
+  .result-hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at top, rgba(0,200,83,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .result-verdict {
+    font-family: var(--font-display);
+    font-size: 13px; letter-spacing: 2px;
+    color: var(--muted); margin-bottom: 0.5rem;
+  }
+  .result-winner {
+    font-family: var(--font-display);
+    font-size: 32px; letter-spacing: 1px;
+    color: var(--gold); line-height: 1.1;
+    margin-bottom: 0.25rem;
+  }
+  .result-action {
+    font-size: 13px; color: var(--muted);
+  }
+  .score-display {
+    display: flex; align-items: center;
+    justify-content: center; gap: 1rem;
+    margin: 1.25rem 0;
+  }
+  .score-team { text-align: center; flex: 1; }
+  .score-team-name {
+    font-size: 12px; color: var(--muted);
+    margin-bottom: 4px; font-weight: 500;
+    white-space: nowrap; overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .score-num {
+    font-family: var(--font-display);
+    font-size: 52px; color: var(--text); line-height: 1;
+  }
+  .score-sep {
+    font-family: var(--font-display);
+    font-size: 36px; color: var(--border);
+    flex-shrink: 0;
+  }
+  .confidence-badge {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 12px; font-weight: 600;
+    margin-top: 0.5rem;
+    letter-spacing: 0.5px;
+  }
+  .conf-high   { background: rgba(0,200,83,0.15); color: var(--green); }
+  .conf-mod    { background: rgba(255,214,0,0.15); color: var(--gold); }
+  .conf-slim   { background: rgba(255,23,68,0.15); color: var(--red); }
+
+  /* ── FACTOR BREAKDOWN ── */
+  .breakdown-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.2rem;
+    margin-bottom: 1rem;
+  }
+  .breakdown-title {
+    font-size: 12px; font-weight: 600;
+    letter-spacing: 1px; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 1rem;
+  }
+  .factor-row {
+    display: flex; align-items: center;
+    gap: 10px; margin-bottom: 10px;
+  }
+  .factor-label {
+    font-size: 12px; color: var(--muted);
+    width: 110px; flex-shrink: 0;
+  }
+  .factor-bars { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+  .bar-wrap {
+    display: flex; align-items: center; gap: 6px;
+  }
+  .bar-track {
+    flex: 1; height: 6px;
+    background: var(--surface2);
+    border-radius: 3px; overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%; border-radius: 3px;
+    transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
+  }
+  .bar-t1 { background: var(--green); }
+  .bar-t2 { background: var(--red); }
+  .bar-val {
+    font-size: 11px; font-weight: 600;
+    width: 28px; text-align: right;
+  }
+  .val-t1 { color: var(--green); }
+  .val-t2 { color: var(--red); }
+
+  /* ── WIN PROBABILITY ── */
+  .prob-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.2rem;
+    margin-bottom: 1rem;
+  }
+  .prob-bar-outer {
+    height: 10px; border-radius: 5px;
+    background: var(--red);
+    margin: 0.75rem 0 0.5rem;
+    overflow: hidden;
+  }
+  .prob-bar-inner {
+    height: 100%; border-radius: 5px;
+    background: var(--green);
+    transition: width 1s cubic-bezier(0.4,0,0.2,1);
+  }
+  .prob-labels {
+    display: flex; justify-content: space-between;
+    font-size: 13px; font-weight: 600;
+  }
+
+  /* ── DISCLAIMER ── */
+  .disclaimer {
+    font-size: 11px; color: var(--muted);
+    text-align: center; padding: 1rem 0 2rem;
+    line-height: 1.6;
+  }
+
+  /* ── PROGRESS BAR ANIMATION ── */
+  @keyframes fillIn { from { width: 0; } }
+  .animate { animation: fillIn 0.8s cubic-bezier(0.4,0,0.2,1) forwards; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-ball">⚽</div>
+  <div class="header-text">
+    <h1>FIFA WORLD CUP 2026 Predictor</h1>
+    <p>7-FACTOR WEIGHTED ANALYSIS</p>
+  </div>
+</div>
+
+<!-- STEP DOTS -->
+<div class="steps">
+  <div class="step-dot active" id="dot-1"></div>
+  <div class="step-dot" id="dot-2"></div>
+  <div class="step-dot" id="dot-3"></div>
+  <div class="step-dot" id="dot-4"></div>
+</div>
+
+<!-- ══ SCREEN 1: TEAM NAMES ══ -->
+<div class="screen active" id="screen-1">
+  <p class="section-label" style="margin-top:1.2rem">Match Setup</p>
+
+  <div class="team-card">
+    <div class="team-card-header">
+      <div class="team-badge badge-1">H</div>
+      <span class="team-card-title">HOME TEAM</span>
+    </div>
+    <div class="field">
+      <label>Team Name</label>
+      <input type="text" id="t1-name" placeholder="e.g. Brazil" autocomplete="off">
+    </div>
+    <div class="form-row">
+      <div class="field" style="margin:0">
+        <label>FIFA Ranking</label>
+        <input type="number" id="t1-rank" placeholder="1" min="1" max="211">
+      </div>
+      <div class="field" style="margin:0">
+        <label>Key Players Avail.</label>
+        <input type="number" id="t1-squad" placeholder="11" min="0" max="11">
+      </div>
+    </div>
+  </div>
+
+  <div class="team-card">
+    <div class="team-card-header">
+      <div class="team-badge badge-2">A</div>
+      <span class="team-card-title">AWAY TEAM</span>
+    </div>
+    <div class="field">
+      <label>Team Name</label>
+      <input type="text" id="t2-name" placeholder="e.g. France" autocomplete="off">
+    </div>
+    <div class="form-row">
+      <div class="field" style="margin:0">
+        <label>FIFA Ranking</label>
+        <input type="number" id="t2-rank" placeholder="2" min="1" max="211">
+      </div>
+      <div class="field" style="margin:0">
+        <label>Key Players Avail.</label>
+        <input type="number" id="t2-squad" placeholder="11" min="0" max="11">
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-primary" onclick="goTo(2)">NEXT →</button>
+</div>
+
+<!-- ══ SCREEN 2: RECENT FORM ══ -->
+<div class="screen" id="screen-2">
+  <p class="section-label" style="margin-top:1.2rem">Recent Form — Last 5 Games</p>
+
+  <div class="team-card" id="form-card-1">
+    <div class="team-card-header">
+      <div class="team-badge badge-1" id="form-badge-1">T1</div>
+      <span class="team-card-title" id="form-title-1">TEAM ONE</span>
+    </div>
+    <div class="form-row">
+      <div class="field" style="margin:0">
+        <label>Wins</label>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('t1-fw',-1)">−</button>
+          <input type="number" id="t1-fw" value="0" min="0" max="5" readonly>
+          <button class="num-btn" onclick="adj('t1-fw',1)">+</button>
+        </div>
+      </div>
+      <div class="field" style="margin:0">
+        <label>Draws</label>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('t1-fd',-1)">−</button>
+          <input type="number" id="t1-fd" value="0" min="0" max="5" readonly>
+          <button class="num-btn" onclick="adj('t1-fd',1)">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Losses</label>
+      <div class="num-row">
+        <button class="num-btn" onclick="adj('t1-fl',-1)">−</button>
+        <input type="number" id="t1-fl" value="0" min="0" max="5" readonly style="max-width:80px">
+        <button class="num-btn" onclick="adj('t1-fl',1)">+</button>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field" style="margin:0">
+        <label>Goals Scored</label>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('t1-gs',-1)">−</button>
+          <input type="number" id="t1-gs" value="0" min="0" max="30" readonly>
+          <button class="num-btn" onclick="adj('t1-gs',1)">+</button>
+        </div>
+      </div>
+      <div class="field" style="margin:0">
+        <label>Goals Conceded</label>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('t1-gc',-1)">−</button>
+          <input type="number" id="t1-gc" value="0" min="0" max="30" readonly>
+          <button class="num-btn" onclick="adj('t1-gc',1)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="team-card">
+    <div class="team-card-header">
+      <div class="team-badge badge-2" id="form-badge-2">T2</div>
+      <span class="team-card-title" id="form-title-2">TEAM TWO</span>
+    </div>
+    <div class="form-row">
+      <div class="field" style="margin:0">
+        <label>Wins</label>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('t2-fw',-1)">−</button>
+          <input type="number" id="t2-fw" value="0" min="0" max="5" readonly>
+          <button class="num-btn" onclick="adj('t2-fw',1)">+</button>
+        </div>
+      </div>
+      <div class="field" style="margin:0">
+        <label>Draws</label>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('t2-fd',-1)">−</button>
+          <input type="number" id="t2-fd" value="0" min="0" max="5" readonly>
+          <button class="num-btn" onclick="adj('t2-fd',1)">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Losses</label>
+      <div class="num-row">
+        <button class="num-btn" onclick="adj('t2-fl',-1)">−</button>
+        <input type="number" id="t2-fl" value="0" min="0" max="5" readonly style="max-width:80px">
+        <button class="num-btn" onclick="adj('t2-fl',1)">+</button>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field" style="margin:0">
+        <label>Goals Scored</label>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('t2-gs',-1)">−</button>
+          <input type="number" id="t2-gs" value="0" min="0" max="30" readonly>
+          <button class="num-btn" onclick="adj('t2-gs',1)">+</button>
+        </div>
+      </div>
+      <div class="field" style="margin:0">
+        <label>Goals Conceded</label>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('t2-gc',-1)">−</button>
+          <input type="number" id="t2-gc" value="0" min="0" max="30" readonly>
+          <button class="num-btn" onclick="adj('t2-gc',1)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-primary" onclick="goTo(3)">NEXT →</button>
+  <button class="btn-secondary" onclick="goTo(1)">← Back</button>
+</div>
+
+<!-- ══ SCREEN 3: H2H + INJURIES ══ -->
+<div class="screen" id="screen-3">
+  <p class="section-label" style="margin-top:1.2rem">Head-to-Head & Fitness</p>
+
+  <div class="team-card">
+    <div class="breakdown-title">Head-to-Head History</div>
+    <div class="form-row">
+      <div class="field" style="margin:0">
+        <label id="h2h-w-label">Team 1 Wins</label>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('h2h-w',-1)">−</button>
+          <input type="number" id="h2h-w" value="0" min="0" max="50" readonly>
+          <button class="num-btn" onclick="adj('h2h-w',1)">+</button>
+        </div>
+      </div>
+      <div class="field" style="margin:0">
+        <label>Draws</label>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('h2h-d',-1)">−</button>
+          <input type="number" id="h2h-d" value="0" min="0" max="50" readonly>
+          <button class="num-btn" onclick="adj('h2h-d',1)">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="field">
+      <label id="h2h-l-label">Team 1 Losses</label>
+      <div class="num-row">
+        <button class="num-btn" onclick="adj('h2h-l',-1)">−</button>
+        <input type="number" id="h2h-l" value="0" min="0" max="50" readonly style="max-width:80px">
+        <button class="num-btn" onclick="adj('h2h-l',1)">+</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="team-card">
+    <div class="breakdown-title">Injuries & Suspensions</div>
+    <div class="form-row">
+      <div class="field" style="margin:0">
+        <label id="inj-1-label">Team 1 Out</label>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('t1-inj',-1)">−</button>
+          <input type="number" id="t1-inj" value="0" min="0" max="11" readonly>
+          <button class="num-btn" onclick="adj('t1-inj',1)">+</button>
+        </div>
+      </div>
+      <div class="field" style="margin:0">
+        <label id="inj-2-label">Team 2 Out</label>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('t2-inj',-1)">−</button>
+          <input type="number" id="t2-inj" value="0" min="0" max="11" readonly>
+          <button class="num-btn" onclick="adj('t2-inj',1)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-primary" onclick="predict()">⚽ PREDICT MATCH</button>
+  <button class="btn-secondary" onclick="goTo(2)">← Back</button>
+</div>
+
+<!-- ══ SCREEN 4: RESULT ══ -->
+<div class="screen" id="screen-4">
+
+  <div class="result-hero" style="margin-top:1.2rem">
+    <p class="result-verdict" id="res-verdict">PREDICTION</p>
+    <p class="result-winner" id="res-winner">—</p>
+    <p class="result-action" id="res-action"></p>
+    <div class="score-display">
+      <div class="score-team">
+        <p class="score-team-name" id="res-t1-name">Team 1</p>
+        <p class="score-num" id="res-s1">0</p>
+      </div>
+      <div class="score-sep">—</div>
+      <div class="score-team">
+        <p class="score-team-name" id="res-t2-name">Team 2</p>
+        <p class="score-num" id="res-s2">0</p>
+      </div>
+    </div>
+    <span class="confidence-badge" id="res-conf">—</span>
+  </div>
+
+  <!-- Win Probability -->
+  <div class="prob-card">
+    <div class="breakdown-title">Win Probability</div>
+    <div class="prob-labels">
+      <span id="prob-t1-name" style="color:var(--green)">T1</span>
+      <span id="prob-t2-name" style="color:var(--red)">T2</span>
+    </div>
+    <div class="prob-bar-outer">
+      <div class="prob-bar-inner" id="prob-bar" style="width:50%"></div>
+    </div>
+    <div class="prob-labels">
+      <span id="prob-p1" style="color:var(--green)">50%</span>
+      <span id="prob-p2" style="color:var(--red)">50%</span>
+    </div>
+  </div>
+
+  <!-- Factor Breakdown -->
+  <div class="breakdown-card">
+    <div class="breakdown-title">Factor Breakdown</div>
+    <div id="factors-list"></div>
+  </div>
+
+  <button class="btn-primary" onclick="reset()">🔄 NEW PREDICTION</button>
+
+  <p class="disclaimer">
+    © Copyright 2026 Thato Baloyi.<br>
+    Bet Resposible.
+  </p>
+</div>
+
+<script>
+const FACTORS = [
+  { key:'ranking', label:'FIFA Ranking',   w:0.20 },
+  { key:'form',    label:'Recent Form',    w:0.25 },
+  { key:'attack',  label:'Goals Scored',   w:0.15 },
+  { key:'defence', label:'Goals Conceded', w:0.10 },
+  { key:'h2h',     label:'Head-to-Head',   w:0.15 },
+  { key:'squad',   label:'Squad Strength', w:0.10 },
+  { key:'injuries',label:'Fitness',        w:0.05 },
+];
+
+let scores1 = {}, scores2 = {};
+
+function $id(id){ return document.getElementById(id); }
+function val(id){ return parseFloat($id(id).value) || 0; }
+
+function adj(id, delta){
+  const el = $id(id);
+  const min = parseFloat(el.min)||0;
+  const max = parseFloat(el.max)||999;
+  el.value = Math.min(max, Math.max(min, (parseFloat(el.value)||0)+delta));
+}
+
+function goTo(n){
+  if(n===2){
+    const n1 = $id('t1-name').value.trim();
+    const n2 = $id('t2-name').value.trim();
+    if(!n1||!n2){ alert('Please enter both team names.'); return; }
+    // update labels on screen 2
+    $id('form-badge-1').textContent = n1.substring(0,2).toUpperCase();
+    $id('form-badge-2').textContent = n2.substring(0,2).toUpperCase();
+    $id('form-title-1').textContent = n1.toUpperCase();
+    $id('form-title-2').textContent = n2.toUpperCase();
+    // h2h labels
+    $id('h2h-w-label').textContent  = n1 + ' Wins';
+    $id('h2h-l-label').textContent  = n1 + ' Losses';
+    $id('inj-1-label').textContent  = n1 + ' Out';
+    $id('inj-2-label').textContent  = n2 + ' Out';
+  }
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  $id('screen-'+n).classList.add('active');
+  updateDots(n);
+  window.scrollTo(0,0);
+}
+
+function updateDots(n){
+  for(let i=1;i<=4;i++){
+    const d=$id('dot-'+i);
+    if(!d) return;
+    d.className='step-dot'+(i<n?' done':i===n?' active':'');
+  }
+}
+
+function formScore(w,d,l){
+  const g=w+d+l; if(!g) return 50;
+  return Math.round((w*3+d)/( g*3)*100);
+}
+function rankScore(r){ return Math.round(Math.max(0,(211-r)/210*100)); }
+function attackScore(g){ return Math.min(100,Math.round(g/5/4*100)); }
+function defenceScore(g){ return Math.max(0,Math.round((1-g/5/4)*100)); }
+function squadScore(k){ return Math.round(Math.min(k/11,1)*100); }
+function injuryScore(i){ return Math.max(0,Math.round((1-i/5)*100)); }
+
+function calcScores(prefix, h2hw, h2hd, h2hl){
+  const rank  = val(prefix+'-rank') || 50;
+  const squad = val(prefix+'-squad');
+  const fw    = val(prefix+'-fw');
+  const fd    = val(prefix+'-fd');
+  const fl    = val(prefix+'-fl');
+  const gs    = val(prefix+'-gs');
+  const gc    = val(prefix+'-gc');
+  const inj   = val(prefix+'-inj');
+  return {
+    ranking:  rankScore(rank),
+    form:     formScore(fw,fd,fl),
+    attack:   attackScore(gs),
+    defence:  defenceScore(gc),
+    h2h:      formScore(h2hw,h2hd,h2hl),
+    squad:    squadScore(squad),
+    injuries: injuryScore(inj),
+  };
+}
+
+function composite(sc){
+  return Math.round(FACTORS.reduce((s,f)=>s+sc[f.key]*f.w,0)*10)/10;
+}
+
+function predictScore(c1,c2){
+  const base=1.2, gap=Math.abs(c1-c2)/100;
+  if(c1>c2) return [Math.max(0,Math.round(base+gap*2)), Math.max(0,Math.round(base-gap))];
+  if(c2>c1) return [Math.max(0,Math.round(base-gap)),   Math.max(0,Math.round(base+gap*2))];
+  return [Math.round(base),Math.round(base)];
+}
+
+function predict(){
+  const n1=$id('t1-name').value.trim()||'Team 1';
+  const n2=$id('t2-name').value.trim()||'Team 2';
+  const h2hw=val('h2h-w'), h2hd=val('h2h-d'), h2hl=val('h2h-l');
+
+  scores1=calcScores('t1',h2hw,h2hd,h2hl);
+  scores2=calcScores('t2',h2hl,h2hd,h2hw);
+
+  const c1=composite(scores1), c2=composite(scores2);
+  const total=c1+c2||1;
+  const p1=Math.round(c1/total*100), p2=100-p1;
+
+  const [s1,s2]=predictScore(c1,c2);
+  const margin=Math.abs(c1-c2);
+  const conf=margin>15?'High':margin>7?'Moderate':'Slim';
+  const confClass={'High':'conf-high','Moderate':'conf-mod','Slim':'conf-slim'}[conf];
+
+  let winner,verdict,action;
+  if(c1>c2){ winner=n1; verdict='WINS THE MATCH'; action='predicted winner'; }
+  else if(c2>c1){ winner=n2; verdict='WINS THE MATCH'; action='predicted winner'; }
+  else{ winner='DRAW'; verdict='TOO CLOSE TO CALL'; action='match likely ends level'; }
+
+  $id('res-winner').textContent=winner;
+  $id('res-verdict').textContent=verdict;
+  $id('res-action').textContent=action;
+  $id('res-t1-name').textContent=n1;
+  $id('res-t2-name').textContent=n2;
+  $id('res-s1').textContent=s1;
+  $id('res-s2').textContent=s2;
+  $id('res-conf').textContent=conf+' Confidence';
+  $id('res-conf').className='confidence-badge '+confClass;
+
+  $id('prob-t1-name').textContent=n1;
+  $id('prob-t2-name').textContent=n2;
+  $id('prob-p1').textContent=p1+'%';
+  $id('prob-p2').textContent=p2+'%';
+  setTimeout(()=>{ $id('prob-bar').style.width=p1+'%'; },100);
+
+  // Render factor bars
+  const list=$id('factors-list');
+  list.innerHTML='';
+  FACTORS.forEach(f=>{
+    const v1=scores1[f.key], v2=scores2[f.key];
+    list.innerHTML+=`
+    <div class="factor-row">
+      <span class="factor-label">${f.label}</span>
+      <div class="factor-bars">
+        <div class="bar-wrap">
+          <div class="bar-track"><div class="bar-fill bar-t1" style="width:0%" data-v="${v1}"></div></div>
+          <span class="bar-val val-t1">${v1}</span>
+        </div>
+        <div class="bar-wrap">
+          <div class="bar-track"><div class="bar-fill bar-t2" style="width:0%" data-v="${v2}"></div></div>
+          <span class="bar-val val-t2">${v2}</span>
+        </div>
+      </div>
+    </div>`;
+  });
+
+  goTo(4);
+  setTimeout(()=>{
+    document.querySelectorAll('.bar-fill').forEach(b=>{
+      b.style.width=b.dataset.v+'%';
+    });
+  },200);
+}
+
+function reset(){
+  document.querySelectorAll('input[type=text]').forEach(i=>i.value='');
+  document.querySelectorAll('input[type=number]').forEach(i=>{
+    if(i.id.includes('rank')) i.value='';
+    else if(i.id.includes('squad')) i.value='';
+    else i.value='0';
+  });
+  goTo(1);
+}
+</script>
+</body>
+</html>
